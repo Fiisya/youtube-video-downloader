@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+    darkMode: 'class',
+    theme: {
+        extend: {
+            colors: {
+                darkBg: '#181818',
+                darkNav: '#121212',
+                darkInput: '#333',
+                primary: '#ff9800',
+                secondary: '#444',
+                footerDark: '#000',
+                footerText: '#bbbbbb',
+            },
+            backgroundImage: {
+                'gradient-indigo-purple': 'linear-gradient(to right, #6366F1, #9333EA)',
+                'gradient-orange': 'linear-gradient(to right, #FF7A00, #FF4500)',  // Dark mode gradient
+                'gradient-button':'linear-gradient(to right,#ec4899, #ef4444, #facc15)'
+            }
+        }
+    }
+};
+
+    </script>
+    <style>
+        /* Transition effects for dark mode */
+        .transition-colors {
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-100 dark:bg-darkBg text-gray-900 dark:text-white transition-colors">
+
+  <!-- Navbar with Dark Mode Toggle -->
+  <nav class="bg-white dark:bg-darkNav shadow-md transition-colors">
+    <div class="container flex items-center justify-between p-6 mx-auto text-gray-600 dark:text-gray-300">
+        <a href="./index.html" class="text-lg font-medium border-b-2 border-transparent hover:text-gray-800 transition-colors duration-300 transform dark:hover:text-gray-200 hover:border-blue-500 mx-1.5 sm:mx-6">
+          YouTube Video Downloader
+        </a>
+        <button id="darkModeToggle" aria-label="darkModeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sun hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 moon dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+        </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <div class="flex-grow flex flex-col items-center text-center px-4 pb-20 transition-colors">
+      <h1 class="text-3xl text-gray-700 sm:text-5xl font-bold pt-6 sm:pt-10 dark:text-white">Free YouTube Video Downloader</h1>
+      <p class="pt-2 sm:pt-4 text-sm sm:text-lg font-normal w-full sm:w-3/4 md:w-1/2 text-gray-700 dark:text-gray-300">
+          Paste a YouTube URL to start downloading now—fast, no ads, and unlimited.
+      </p>
+
+      <label for="videoUrl" class="mt-5 w-full max-w-md text-left">
+        
+
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Enter YouTube Video Link</span>
+          <input type="text" autofocus placeholder="https://www.youtube.com/watch?v=" id="videoUrl" class="w-full h-10 px-4 mt-1 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm text-sm bg-white dark:bg-darkInput dark:text-white focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-500 focus:border-transparent transition-colors"/>
+          <div id="errorMessage" class="mt-2 hidden text-sm text-red-600 dark:text-white font-medium   p-2 rounded-lg"></div>
+        </label>
+      <button 
+    class="mt-4 px-8 py-2 text-sm font-medium rounded-lg shadow-lg transition transform hover:scale-105 hover:shadow-xl focus:outline-none
+    text-white bg-gradient-indigo-purple dark:bg-gradient-orange dark:text-black
+    focus:ring-2 focus:ring-indigo-300 dark:focus:ring-orange-300"
+    onclick="fetchVideoInfo()">
+    Get Video Info
+</button>
+<!----------------------------------BUTTON TO TEST-->
+
+
+      <!-- Loading Indicator -->
+      <div id="loading" class="mt-4 hidden">
+        <div class="flex justify-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500 dark:border-orange-500"></div>
+        </div>
+      </div>
+      
+      <!-- Video Details -->
+      <div id="videoDetails" class="mt-8 px-4 hidden w-full max-w-4xl">
+          <div class="flex flex-col items-center">
+            <img id="videoThumbnail" class="w-64 sm:w-80 rounded-lg shadow-lg transition transform hover:scale-105">
+            <h3 id="videoTitle" class="mt-2 text-lg font-semibold text-gray-900 dark:text-white text-center"></h3>
+          </div>
+          
+          <!-- Video Options -->
+          <div class="mt-6">
+              <h4 class="text-lg font-medium text-gray-800 dark:text-white text-center">Video Options</h4>
+              <div id="videoOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              
+
+              </div>
+          </div>
+
+          <!-- Audio Options -->
+          <div class="mt-6">
+              <h4 class="text-lg font-medium text-gray-800 dark:text-white text-center">Audio Options</h4>
+              <div id="audioOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Sticky Footer -->
+  <footer class="w-full bg-black dark:bg-footerDark text-white dark:text-footerText text-center py-4 fixed bottom-0 left-0 z-10 transition-colors">
+    <p>Made by Aryan</p>
+  </footer>
+
+
+  <script src="./script.js"></script>
+</body>
+</html>
