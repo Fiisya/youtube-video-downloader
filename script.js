@@ -46,7 +46,7 @@ async function fetchVideoInfo() {
     errorMessageBox.style.display = "none"; // Hide error if previously shown
 
     try {
-        let response = await fetch(`https://youtube-video-downloader-vb2m.onrender.com/video_info?url=${encodeURIComponent(urlInput)}`);
+        let response = await fetch(`https://youtubevideodownloader-bzt4.onrender.com/video_info?url=${encodeURIComponent(urlInput)}`);
         let data = await response.json();
 
         if (!response.ok) {
