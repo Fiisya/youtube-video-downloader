@@ -26,26 +26,8 @@
             }
         };
     </script>
-    <style>
-        .transition-colors {
-            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
-        }
-    </style>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-darkBg text-gray-900 dark:text-white transition-colors">
-    <nav class="bg-white dark:bg-darkNav shadow-md transition-colors">
-        <div class="container flex items-center justify-between p-6 mx-auto text-gray-600 dark:text-gray-300">
-            <a href="#" class="text-lg font-medium">YouTube Video Downloader</a>
-            <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                <svg class="h-6 w-6 sun hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <svg class="h-6 w-6 moon dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
-        </div>
-    </nav>
     <div class="flex-grow flex flex-col items-center text-center px-4 pb-20">
         <h1 class="text-3xl font-bold pt-6 dark:text-white">Free YouTube Video Downloader</h1>
         <p class="pt-2 text-sm text-gray-700 dark:text-gray-300">Paste a YouTube URL to start downloading.</p>
@@ -58,54 +40,51 @@
         <div id="loading" class="mt-4 hidden flex justify-center"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500 dark:border-orange-500"></div></div>
         <div id="videoDetails" class="mt-8 px-4 hidden w-full max-w-4xl">
             <div class="flex flex-col items-center">
-                <img id="videoThumbnail" class="w-64 sm:w-80 rounded-lg shadow-lg">
                 <h3 id="videoTitle" class="mt-2 text-lg font-semibold text-gray-900 dark:text-white"></h3>
-            </div>
-            <div class="mt-6">
-                <h4 class="text-lg font-medium text-center">Video Download</h4>
-                <div id="videoOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+                <a id="downloadLink" class="mt-4 px-4 py-2 text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700" target="_blank">Download Video</a>
             </div>
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const isDark = localStorage.getItem('dark-mode') === 'true' || (!localStorage.getItem('dark-mode') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            document.documentElement.classList.toggle('dark', isDark);
-            darkModeToggle.addEventListener('click', function() {
-                const newMode = !document.documentElement.classList.contains('dark');
-                document.documentElement.classList.toggle('dark', newMode);
-                localStorage.setItem('dark-mode', newMode);
-            });
-        });
-
         async function fetchVideoInfo() {
             let urlInput = document.getElementById("videoUrl").value.trim();
             let loadingIndicator = document.getElementById("loading");
             let videoDetailsContainer = document.getElementById("videoDetails");
             let errorMessageBox = document.getElementById("errorMessage");
+            let titleElement = document.getElementById("videoTitle");
+            let downloadLink = document.getElementById("downloadLink");
+            
             function showError(message) {
                 errorMessageBox.innerText = message;
                 errorMessageBox.style.display = "block";
                 setTimeout(() => { errorMessageBox.style.display = "none"; }, 4000);
             }
+            
             if (!urlInput.includes("youtube.com") && !urlInput.includes("youtu.be")) {
                 showError("❌ Please enter a valid YouTube video URL!");
                 return;
             }
+            
             loadingIndicator.style.display = "block";
             videoDetailsContainer.style.display = "none";
             errorMessageBox.style.display = "none";
+            
             try {
-                let response = await fetch(`https://api.vreden.my.id/api/ytmp4?url=${encodeURIComponent(urlInput)}`);
+                let response = await fetch(`https://api.siputzx.my.id/api/d/ytmp4?url=${encodeURIComponent(urlInput)}`);
                 let data = await response.json();
-                if (data.status !== 200 || !data.result.status) throw new Error("Failed to fetch video details.");
-                document.getElementById("videoTitle").innerText = data.result.metadata.title;
-                document.getElementById("videoThumbnail").src = data.result.metadata.thumbnail;
-                document.getElementById("videoOptions").innerHTML = `<a href="${data.result.download.url}" class="text-blue-500">Download Video (${data.result.download.quality})</a>`;
+                
+                if (!data.status || !data.data.dl) throw new Error("Failed to fetch video details.");
+                
+                titleElement.innerText = data.data.title || "YouTube Video";
+                downloadLink.href = data.data.dl;
+                downloadLink.style.display = "block";
+                
                 videoDetailsContainer.style.display = "block";
-            } catch (error) { showError(error.message); }
-            finally { loadingIndicator.style.display = "none"; }
+            } catch (error) { 
+                showError(error.message); 
+            } finally { 
+                loadingIndicator.style.display = "none"; 
+            }
         }
     </script>
 </body>
